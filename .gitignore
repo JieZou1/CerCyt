@@ -6,6 +6,7 @@ logs/
 snapshots/
 doc/
 exp/
+results/
 
 #################
 ## IntelliJ
