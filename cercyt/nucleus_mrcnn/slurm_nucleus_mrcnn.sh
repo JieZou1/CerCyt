@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --workdir=/slurm_storage/jzou/programs/CerCyt/cercyt/nucleus_mrcnn/
-#SBATCH --output=slurm_storage/jzou/programs/CerCyt/cercyt/nucleus_mrcnn/slurm_%j.out
+#SBATCH --output=/slurm_storage/jzou/programs/CerCyt/cercyt/nucleus_mrcnn/slurm_%j.out
 #SBATCH --error=/slurm_storage/jzou/programs/CerCyt/cercyt/nucleus_mrcnn/slurm_%j.error
 #SBATCH --job-name=nucleus_mrcnn
 #SBATCH --gres=gpu:1
