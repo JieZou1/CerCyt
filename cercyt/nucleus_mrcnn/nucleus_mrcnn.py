@@ -26,6 +26,7 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
 import os
+import sys
 import numpy as np
 import datetime
 
@@ -35,6 +36,10 @@ from mrcnn import model as modellib
 from mrcnn.config import Config
 from mrcnn import utils
 from mrcnn import visualize
+
+# Import CerCyt
+if __name__ == '__main__':
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..')) # To find local version of the library
 
 from cercyt.nucleus_mrcnn.kaggle_nucleus_dataset import VAL_IMAGE_IDS as VAL_IMAGE_IDS
 from cercyt.nucleus_mrcnn.kaggle_nucleus_dataset import KaggleNucleusDataset
