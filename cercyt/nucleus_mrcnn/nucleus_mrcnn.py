@@ -19,8 +19,6 @@ Usage:
 # This has to be done before other importa that might
 # set it, but only if we're running in script mode
 # rather than being imported.
-from cercyt.nucleus_mrcnn.nlm_nucleus_dataset import NlmNucleusDataset
-
 if __name__ == '__main__':
     import matplotlib
     # Agg backend runs without a display
@@ -45,6 +43,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))  # To fi
 
 from cercyt.nucleus_mrcnn.kaggle_nucleus_dataset import VAL_IMAGE_IDS as VAL_IMAGE_IDS
 from cercyt.nucleus_mrcnn.kaggle_nucleus_dataset import KaggleNucleusDataset
+from cercyt.nucleus_mrcnn.nlm_nucleus_dataset import NlmNucleusDataset
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath(".")
