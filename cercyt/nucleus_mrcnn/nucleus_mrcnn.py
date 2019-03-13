@@ -19,6 +19,8 @@ Usage:
 # This has to be done before other importa that might
 # set it, but only if we're running in script mode
 # rather than being imported.
+from cercyt.nucleus_mrcnn.nlm_nucleus_dataset import NlmNucleusDataset
+
 if __name__ == '__main__':
     import matplotlib
     # Agg backend runs without a display
@@ -29,6 +31,7 @@ import os
 import sys
 import numpy as np
 import datetime
+import skimage.io
 
 from imgaug import augmenters as iaa
 
@@ -38,8 +41,7 @@ from mrcnn import utils
 from mrcnn import visualize
 
 # Import CerCyt
-if __name__ == '__main__':
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..')) # To find local version of the library
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))  # To find local version of the library
 
 from cercyt.nucleus_mrcnn.kaggle_nucleus_dataset import VAL_IMAGE_IDS as VAL_IMAGE_IDS
 from cercyt.nucleus_mrcnn.kaggle_nucleus_dataset import KaggleNucleusDataset
@@ -293,6 +295,41 @@ def detect(model, dataset_dir, subset):
     print("Saved to ", submit_dir)
 
 
+def segment(model, image_folder):
+
+    # Read dataset
+    dataset = NlmNucleusDataset()
+    dataset.load_nucleus_from_patches(image_folder)
+    dataset.prepare()
+
+    # Load over images
+    for image_id in dataset.image_ids:
+        """Run segmentation on an image."""
+
+        # Load image and run detection
+        image = dataset.load_image(image_id)
+        r = model.detect([image])[0]
+
+        # save segmentation visulization
+        image_path = dataset.image_info[image_id]['path']
+        vis_path = image_path.replace('patches', 'MCRNN').replace('.tif', '.jpg')
+        # vis_path = vis_path.replace('.tif', '.jpg')
+        visualize.display_instances(
+            image, r['rois'], r['masks'], r['class_ids'],
+            'nucleus', r['scores'],
+            show_bbox=False, show_mask=False,
+            title="Predictions")
+        plt.savefig(vis_path)
+
+        # save segmentation result in txt
+        # Encode image to RLE. Returns a string of multiple lines
+        rle_path = image_path.replace('patches', 'MCRNN').replace('.tif', '.txt')
+        source_id = dataset.image_info[image_id]["id"]
+        rle = mask_to_rle(source_id, r["masks"], r["scores"])
+        with open(rle_path, "w") as f:
+            f.write(rle)
+
+
 if __name__ == '__main__':
     import argparse
 
@@ -301,7 +338,7 @@ if __name__ == '__main__':
         description='Mask R-CNN for nuclei counting and segmentation')
     parser.add_argument("command",
                         metavar="<command>",
-                        help="'train' or 'detect'")
+                        help="'train', 'detect' or 'segment")
     parser.add_argument('--dataset', required=False,
                         metavar="/path/to/dataset/",
                         help='Root directory of the dataset')
@@ -315,6 +352,9 @@ if __name__ == '__main__':
     parser.add_argument('--subset', required=False,
                         metavar="Dataset sub-directory",
                         help="Subset of dataset to run prediction on")
+    parser.add_argument('--image_folder', required=False,
+                        metavar="/path/to/image_folder",
+                        help="The folder path of the images to be segmented")
     args = parser.parse_args()
 
     # Validate arguments
@@ -322,6 +362,8 @@ if __name__ == '__main__':
         assert args.dataset, "Argument --dataset is required for training"
     elif args.command == "detect":
         assert args.subset, "Provide --subset to run prediction on"
+    elif args.command == "segment":
+        assert args.image_folder, "Provide --image_folder to run prediction on"
 
     print("Weights: ", args.weights)
     print("Dataset: ", args.dataset)
@@ -339,10 +381,12 @@ if __name__ == '__main__':
     # Create model
     if args.command == "train":
         model = modellib.MaskRCNN(mode="training", config=config, model_dir=args.logs)
+    elif args.command == 'detect':
+        model = modellib.MaskRCNN(mode="inference", config=config, model_dir=args.logs)
     else:
         model = modellib.MaskRCNN(mode="inference", config=config, model_dir=args.logs)
 
-    # Select weights file to load
+# Select weights file to load
     if args.weights.lower() == "coco":
         weights_path = COCO_WEIGHTS_PATH
         # Download weights file
@@ -373,6 +417,8 @@ if __name__ == '__main__':
         train(model, args.dataset, args.subset)
     elif args.command == "detect":
         detect(model, args.dataset, args.subset)
+    elif args.command == 'segment':
+        segment(model, args.image_folder)
     else:
         print("'{}' is not recognized. "
               "Use 'train' or 'detect'".format(args.command))
