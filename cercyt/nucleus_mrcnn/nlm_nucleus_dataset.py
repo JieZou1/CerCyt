@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import skimage.io
-from openslide import OpenSlide
+# from openslide import OpenSlide
 
 from mrcnn import utils
 
