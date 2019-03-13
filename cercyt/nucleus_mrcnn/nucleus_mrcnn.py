@@ -155,7 +155,7 @@ def train(model, dataset_dir, subset):
 
     # Validation dataset
     dataset_val = KaggleNucleusDataset()
-    dataset_val.load_nucleus(dataset_dir, "val")
+    dataset_val.load_nucleus(dataset_dir, "stage1_train-cervical")
     dataset_val.prepare()
 
     # Image augmentation
