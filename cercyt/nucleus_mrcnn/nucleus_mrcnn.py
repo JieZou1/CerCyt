@@ -44,20 +44,30 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))  # To fi
 from cercyt.nucleus_mrcnn.kaggle_nucleus_dataset import VAL_IMAGE_IDS as VAL_IMAGE_IDS
 from cercyt.nucleus_mrcnn.kaggle_nucleus_dataset import KaggleNucleusDataset
 from cercyt.nucleus_mrcnn.nlm_nucleus_dataset import NlmNucleusDataset
+from cercyt.config import DIR_NUCLEUS_MRCNN, DIR_DATA_SCIENCE_BOWL_2018, DIR_NLM_PATCH
 
 # Root directory of the project
-ROOT_DIR = os.path.abspath(".")
+# ROOT_DIR = os.path.abspath(".")
+ROOT_DIR = DIR_NUCLEUS_MRCNN
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
+
+DEFAULT_MODEL_DIR = os.path.join(ROOT_DIR, 'models')
+
+DEFAULT_IMAGE_DIR = os.path.join(DIR_NLM_PATCH, '12XS00147')
 
 # Results directory
 # Save submission files here
 RESULTS_DIR = os.path.join(ROOT_DIR, "results")
 
 # Path to trained weights file
-COCO_WEIGHTS_PATH = os.path.join(ROOT_DIR, "models/mask_rcnn_coco.h5")
+COCO_WEIGHTS_PATH = os.path.join(DEFAULT_MODEL_DIR, "mask_rcnn_coco.h5")
+KAGGLE_ALL_WEIGHTS_PATH = os.path.join(DEFAULT_MODEL_DIR, "mask_rcnn_nucleus_0040-all_kaggle.h5")
+KAGGLE_16_WEIGHTS_PATH = os.path.join(DEFAULT_MODEL_DIR, "mask_rcnn_nucleus_0040-16_kaggle.h5")
+
+
 
 ############################################################
 #  Configurations
@@ -305,13 +315,18 @@ def segment(model, image_folder):
     for image_id in dataset.image_ids:
         """Run segmentation on an image."""
 
+        image_path = dataset.image_info[image_id]['path']
+        vis_path = image_path.replace('patches', 'MCRNN').replace('.tif', '.jpg')
+        rle_path = image_path.replace('patches', 'MCRNN').replace('.tif', '.txt')
+
+        if os.path.exists(vis_path) and os.path.exists(rle_path):
+            continue
+
         # Load image and run detection
         image = dataset.load_image(image_id)
         r = model.detect([image])[0]
 
         # save segmentation visulization
-        image_path = dataset.image_info[image_id]['path']
-        vis_path = image_path.replace('patches', 'MCRNN').replace('.tif', '.jpg')
         # vis_path = vis_path.replace('.tif', '.jpg')
         visualize.display_instances(
             image, r['rois'], r['masks'], r['class_ids'],
@@ -322,7 +337,6 @@ def segment(model, image_folder):
 
         # save segmentation result in txt
         # Encode image to RLE. Returns a string of multiple lines
-        rle_path = image_path.replace('patches', 'MCRNN').replace('.tif', '.txt')
         source_id = dataset.image_info[image_id]["id"]
         rle = mask_to_rle(source_id, r["masks"], r["scores"])
         with open(rle_path, "w") as f:
@@ -337,22 +351,27 @@ if __name__ == '__main__':
         description='Mask R-CNN for nuclei counting and segmentation')
     parser.add_argument("command",
                         metavar="<command>",
+                        default='segment',
                         help="'train', 'detect' or 'segment")
     parser.add_argument('--dataset', required=False,
                         metavar="/path/to/dataset/",
+                        default=DIR_DATA_SCIENCE_BOWL_2018,
                         help='Root directory of the dataset')
-    parser.add_argument('--weights', required=True,
+    parser.add_argument('--weights', required=False,
                         metavar="/path/to/weights.h5",
-                        help="Path to weights .h5 file or 'coco'")
+                        default=KAGGLE_16_WEIGHTS_PATH,
+                        help="Path to model weights .h5 file or 'coco'")
     parser.add_argument('--logs', required=False,
-                        default=DEFAULT_LOGS_DIR,
                         metavar="/path/to/logs/",
+                        default=DEFAULT_LOGS_DIR,
                         help='Logs and checkpoints directory (default=logs/)')
     parser.add_argument('--subset', required=False,
                         metavar="Dataset sub-directory",
+                        default='stage1_train-cervical',
                         help="Subset of dataset to run prediction on")
     parser.add_argument('--image_folder', required=False,
                         metavar="/path/to/image_folder",
+                        default=DEFAULT_IMAGE_DIR,
                         help="The folder path of the images to be segmented")
     args = parser.parse_args()
 
