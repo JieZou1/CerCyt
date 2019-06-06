@@ -45,7 +45,7 @@ for slide_id in slides:
     patch_folder = os.path.join(DIR_tile_patches, slide_id)
     tif_paths = glob.glob(patch_folder + '/*.tif')
 
-    tif_paths = random.sample(tif_paths, 2000)
+    tif_paths = random.sample(tif_paths, 500)
 
     # Load over images
     for tif_path in tif_paths:
@@ -82,11 +82,12 @@ for slide_id in slides:
         # save individual cell patches
         masks = results['masks']
         scores = results['scores']
+        if len(scores) == 0:
+            continue
         height, width, depth = masks.shape
         # for i in range(depth):
-        for i in range(3):
-            score = scores[i]
-            if score < 0.9:
+        for i in range(min(depth, 3)):
+            if scores[i] < 0.9:
                 continue
             mask = masks[:, :, i].astype('uint8') * 255
             # cv2.imshow('mask', mask)  # display for checking

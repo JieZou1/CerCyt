@@ -93,7 +93,7 @@ class DataInfo:
 
     @staticmethod
     def get_normal_cell_patch_classification_train_slide_ids():
-        ids = ['12XS05976']
+        ids = ['12XS05948', '12XS05976', '15XS00465', '17XS00645', '18XS00065']
         return ids
 
     @staticmethod

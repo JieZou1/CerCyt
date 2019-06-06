@@ -29,10 +29,11 @@ def load_data():
 
 train_normal_ids, train_abnormal_ids, validation_normal_ids, validation_abnormal_ids = load_data()
 
-# for id in train_normal_ids:
-#     folder, file = os.path.split(id)
-#     path = os.path.join(DIR_cell_patch_all, 'train', 'normal', file)
-#     copyfile(id, path)
+shuffle(train_normal_ids)
+for id in train_normal_ids[:5000]:
+    folder, file = os.path.split(id)
+    path = os.path.join(DIR_cell_patch_all, 'train', 'normal', file)
+    copyfile(id, path)
 #
 # for id in train_abnormal_ids:
 #     folder, file = os.path.split(id)
