@@ -3,9 +3,10 @@ import skimage
 import numpy as np
 
 from cercyt.BD_cytology_25.cell_patch_classification.shared import \
-    DataInfo, NDPI_Slide, \
+    DataInfo, \
     FILE_DATA_INFO, DIR_annotated, DIR_ink, DIR_image_align_ink2clean, DIR_cLEAN2, DIR_G_Tom_Patch_normal, \
     DIR_G_Tom_Patch_malignancy, DIR_G_Tom_Patch_abnormal
+from cercyt.shared.NDPI_Slide import NDPI_Slide
 
 data_info = DataInfo(FILE_DATA_INFO)
 slide_ids = data_info.get_abnormal_slide_ids()

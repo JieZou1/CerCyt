@@ -5,13 +5,13 @@ import skimage
 from cercyt.BD_cytology_25.cell_patch_classification.shared import \
     DIR_cLEAN2, \
     DIR_roi_level0, \
-    NDPI_Slide, \
     DIR_patch_level0
 
 #
 # Crop level 0 roi and save as TIF images
 # Totally 6 slides have no blue ink ROI, we ignore them
 #
+from cercyt.shared.NDPI_Slide import NDPI_Slide
 
 for coord_path in glob.glob(DIR_roi_level0 + '/*.txt'):
 

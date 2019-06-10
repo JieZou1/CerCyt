@@ -6,8 +6,8 @@ import os
 import numpy as np
 from cercyt.BD_cytology_25.cell_patch_classification.shared import \
     DIR_roi_level0, DIR_annotated, DIR_ink, DIR_cLEAN2, DIR_image_align_ink2clean, \
-    DIR_G_Tom_Patch_normal, DIR_G_Tom_Patch_abnormal, DIR_G_Tom_Patch_malignancy, DIR_roi_ndpa_level4, \
-    NDPI_Slide
+    DIR_G_Tom_Patch_normal, DIR_G_Tom_Patch_abnormal, DIR_G_Tom_Patch_malignancy, DIR_roi_ndpa_level4
+from cercyt.shared.NDPI_Slide import NDPI_Slide
 
 save_annotations = False
 

@@ -22,9 +22,11 @@ from mrcnn import model as modellib
 from cercyt.nucleus_mrcnn.nucleus_mrcnn import NucleusInferenceConfig
 
 from cercyt.BD_cytology_25.cell_patch_classification.shared import \
-    PatchDataset, NDPI_Slide, \
+    PatchDataset, \
     DIR_G_Tom_Patch_abnormal, DIR_cLEAN2, DIR_annotated, intersection, DIR_cell_patch_abnormal, DIR_cell_patch_normal, \
     CELL_SIZE
+from cercyt.shared.NDPI_Slide import NDPI_Slide
+
 
 patch_folder = DIR_G_Tom_Patch_abnormal
 model_path = r'Y:\Users\Jie\CerCyt\nucleus_mrcnn\models\mask_rcnn_nucleus_0040-16_kaggle.h5'

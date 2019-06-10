@@ -17,7 +17,8 @@ import skimage
 from mrcnn import model as modellib, visualize
 
 from cercyt.nucleus_mrcnn.nucleus_mrcnn import NucleusInferenceConfig
-from cercyt.BD_cytology_25.cell_patch_classification.shared import DIR_nuclei_segmentation, DIR_cLEAN2, NDPI_Slide
+from cercyt.BD_cytology_25.cell_patch_classification.shared import DIR_nuclei_segmentation, DIR_cLEAN2
+from cercyt.shared.NDPI_Slide import NDPI_Slide
 
 model_path = r'Y:\Users\Jie\CerCyt\nucleus_mrcnn\models\mask_rcnn_nucleus_0040-16_kaggle.h5'
 

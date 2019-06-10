@@ -3,8 +3,6 @@
 # This has to be done before other importa that might
 # set it, but only if we're running in script mode
 # rather than being imported.
-import random
-
 if __name__ == '__main__':
     import matplotlib
     # Agg backend runs without a display
@@ -17,6 +15,7 @@ import glob
 import cv2
 import numpy as np
 import skimage
+import random
 
 from mrcnn import visualize
 from mrcnn import model as modellib
@@ -24,9 +23,12 @@ from mrcnn import model as modellib
 from cercyt.nucleus_mrcnn.nucleus_mrcnn import NucleusInferenceConfig
 
 from cercyt.BD_cytology_25.cell_patch_classification.shared import \
-    PatchDataset, NDPI_Slide, \
+    PatchDataset, \
     DIR_cLEAN2, DIR_cell_patch_normal, \
     CELL_SIZE, DataInfo, FILE_DATA_INFO, DIR_tile_patches
+
+from cercyt.shared.NDPI_Slide import NDPI_Slide
+
 
 data_info = DataInfo(FILE_DATA_INFO)
 slides = data_info.get_normal_cell_patch_classification_train_slide_ids() + \

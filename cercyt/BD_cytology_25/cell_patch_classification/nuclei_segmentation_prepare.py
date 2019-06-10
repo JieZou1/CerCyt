@@ -4,7 +4,8 @@ import random
 import skimage
 
 from cercyt.BD_cytology_25.cell_patch_classification.shared import DataInfo, FILE_DATA_INFO, DIR_tile_patches, \
-    DIR_cLEAN2, NDPI_Slide, DIR_nuclei_segmentation
+    DIR_cLEAN2, DIR_nuclei_segmentation
+from cercyt.shared.NDPI_Slide import NDPI_Slide
 
 data_info = DataInfo(FILE_DATA_INFO)
 patch_size = 1024
