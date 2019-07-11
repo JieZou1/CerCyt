@@ -42,9 +42,11 @@ Move the images to the folders to prepare to use ImageDataGenerator for Keras tr
 ### cell_patch_classification
 To Train and Classify cell patches
 
+### nuclei_segmentation_prepare_normal
+Collect some 1024x1024 patches from normal NDPI slides for evaluate MRCNN nuclei segmentation
 
-### nuclei_segmentation_prepare
-Collect some 1024x1024 patches from NDPI slides for evaluate MRCNN nuclei segmentation
+### nuclei_segmentation_prepare_abnormal
+Collect some 1024x1024 patches from abnormal NDPI slides for evaluate MRCNN nuclei segmentation
 
 ### nuclei_segmentation_mrcnn
 Do automatic MRCNN nuclei segmentation

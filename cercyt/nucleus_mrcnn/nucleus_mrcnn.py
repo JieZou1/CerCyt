@@ -164,7 +164,8 @@ def train(model, dataset_dir, subset):
 
     # Validation dataset
     dataset_val = KaggleNucleusDataset()
-    dataset_val.load_nucleus(dataset_dir, "stage1_train-cervical")
+    # dataset_val.load_nucleus(dataset_dir, "val")
+    dataset_val.load_nucleus(dataset_dir, "stage1_train_cervical_val")
     dataset_val.prepare()
 
     # Image augmentation
@@ -183,17 +184,17 @@ def train(model, dataset_dir, subset):
 
     # If starting from imagenet, train heads only for a bit
     # since they have random weights
-    print("Train network heads")
-    model.train(dataset_train, dataset_val,
-                learning_rate=config.LEARNING_RATE,
-                epochs=20,
-                augmentation=augmentation,
-                layers='heads')
+    # print("Train network heads")
+    # model.train(dataset_train, dataset_val,
+    #             learning_rate=config.LEARNING_RATE,
+    #             epochs=80,
+    #             augmentation=augmentation,
+    #             layers='heads')
 
     print("Train all layers")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=40,
+                epochs=120,
                 augmentation=augmentation,
                 layers='all')
 
@@ -359,7 +360,10 @@ if __name__ == '__main__':
                         help='Root directory of the dataset')
     parser.add_argument('--weights', required=False,
                         metavar="/path/to/weights.h5",
-                        default=KAGGLE_16_WEIGHTS_PATH,
+                        # default='imagenet',     # defautl imagenet weights
+                        # default=r'Y:\Users\Jie\CerCyt\nucleus_mrcnn\logs\nucleus20190709T1625\mask_rcnn_nucleus_0040.h5',
+                        default=r'Y:\Users\Jie\CerCyt\nucleus_mrcnn\logs\nucleus20190709T1625\mask_rcnn_nucleus_0060.h5',
+                        # default=KAGGLE_16_WEIGHTS_PATH,
                         help="Path to model weights .h5 file or 'coco'")
     parser.add_argument('--logs', required=False,
                         metavar="/path/to/logs/",
@@ -367,7 +371,8 @@ if __name__ == '__main__':
                         help='Logs and checkpoints directory (default=logs/)')
     parser.add_argument('--subset', required=False,
                         metavar="Dataset sub-directory",
-                        default='stage1_train-cervical',
+                        # default='train',    # stage1_train minus validation set
+                        default='stage1_train_cervical_train',
                         help="Subset of dataset to run prediction on")
     parser.add_argument('--image_folder', required=False,
                         metavar="/path/to/image_folder",

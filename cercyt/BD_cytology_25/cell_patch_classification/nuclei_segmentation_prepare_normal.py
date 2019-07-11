@@ -14,9 +14,6 @@ patch_size = 1024
 slides = data_info.get_normal_cell_patch_classification_train_slide_ids() + \
          data_info.get_normal_cell_patch_classification_test_slide_ids()
 dir_to_save = os.path.join(DIR_nuclei_segmentation, 'normal')
-# slides = data_info.get_abnormal_cell_patch_classification_train_slide_ids() + \
-#          data_info.get_abnormal_cell_patch_classification_test_slide_ids()
-# dir_to_save = os.path.join(DIR_nuclei_segmentation, 'abnormal')
 
 for slide_id in slides:
     patch_folder = os.path.join(DIR_tile_patches, slide_id)
@@ -36,7 +33,7 @@ for slide_id in slides:
         ndpi_path = os.path.join(DIR_cLEAN2, ndpi_id + '.ndpi')
         ndpi_slide = NDPI_Slide(ndpi_path)
 
-        # Load image and run detection
+        # Load image and save results
         image = ndpi_slide.read_region((x, y), 0, (patch_size, patch_size))
         cell_path = os.path.join(dir_to_save, '{0}_{1}_{2}_{3}_{4}.bmp'.format(ndpi_id, x, y, patch_size, patch_size))
         skimage.io.imsave(cell_path, image)

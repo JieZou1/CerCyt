@@ -3,6 +3,7 @@ from openslide import OpenSlide
 import xml.etree.ElementTree as ET
 import cv2
 
+
 class NDPI_Slide:
 
     def __init__(self, ndpi_path):
