@@ -19,6 +19,9 @@ Usage:
 # This has to be done before other importa that might
 # set it, but only if we're running in script mode
 # rather than being imported.
+import io
+import json
+
 if __name__ == '__main__':
     import matplotlib
     # Agg backend runs without a display
@@ -30,6 +33,8 @@ import sys
 import numpy as np
 import datetime
 import skimage.io
+from pycocotools.coco import COCO
+import pycocotools.mask
 
 from imgaug import augmenters as iaa
 
@@ -194,7 +199,7 @@ def train(model, dataset_dir, subset):
     print("Train all layers")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=120,
+                epochs=100,
                 augmentation=augmentation,
                 layers='all')
 
@@ -312,36 +317,62 @@ def segment(model, image_folder):
     dataset.load_nucleus_from_patches(image_folder)
     dataset.prepare()
 
-    # Load over images
-    for image_id in dataset.image_ids:
-        """Run segmentation on an image."""
+    json_path = 'results.json'
+    with io.open(json_path, 'w', encoding='utf8') as output:
+        print('Writing results to: %s' % json_path)
+        output.write('[\n')
 
-        image_path = dataset.image_info[image_id]['path']
-        vis_path = image_path.replace('patches', 'MCRNN').replace('.tif', '.jpg')
-        rle_path = image_path.replace('patches', 'MCRNN').replace('.tif', '.txt')
+        # Load over images
+        for i, image_id in enumerate(dataset.image_ids):
+            """Run segmentation on an image."""
 
-        if os.path.exists(vis_path) and os.path.exists(rle_path):
-            continue
+            image_path = dataset.image_info[image_id]['path']
+            vis_path = image_path.replace('patches', 'MCRNN').replace('.bmp', '.jpg')
+            rle_path = image_path.replace('patches', 'MCRNN').replace('.bmp', '.txt')
 
-        # Load image and run detection
-        image = dataset.load_image(image_id)
-        r = model.detect([image])[0]
+            # if os.path.exists(vis_path) and os.path.exists(rle_path):
+            #     continue
 
-        # save segmentation visulization
-        # vis_path = vis_path.replace('.tif', '.jpg')
-        visualize.display_instances(
-            image, r['rois'], r['masks'], r['class_ids'],
-            'nucleus', r['scores'],
-            show_bbox=False, show_mask=False,
-            title="Predictions")
-        plt.savefig(vis_path)
+            # Load image and run detection
+            image = dataset.load_image(image_id)
+            r = model.detect([image])[0]
 
-        # save segmentation result in txt
-        # Encode image to RLE. Returns a string of multiple lines
-        source_id = dataset.image_info[image_id]["id"]
-        rle = mask_to_rle(source_id, r["masks"], r["scores"])
-        with open(rle_path, "w") as f:
-            f.write(rle)
+            rois = r['rois']
+            masks = r['masks']
+            class_ids = r['class_ids']
+            scores = r['scores']
+
+            # save segmentation visualization
+            vis_path = vis_path.replace('.tif', '.jpg')
+            visualize.display_instances(image, rois, masks, class_ids, 'nucleus', scores, show_bbox=False,
+                                        show_mask=False, title="Predictions")
+            plt.savefig(vis_path)
+
+            # save segmentation result in txt
+            # Encode image to RLE. Returns a string of multiple lines
+            # source_id = dataset.image_info[image_id]["id"]
+            # rle = mask_to_rle(source_id, masks, scores)
+            # with open(rle_path, "w") as f:
+            #     f.write(rle)
+
+            # save segmentation result to COCO format
+            coco_rles = pycocotools.mask.encode(np.asfortranarray(masks.astype('uint8')))
+            for k, coco_rle in enumerate(coco_rles):
+                coco_seg_result = {'image_id': int(i), 'category_id': int(1), 'segmentation': coco_rle, 'score': float(scores[k])}
+                coco_seg_result['segmentation']['counts'] = coco_rle['counts'].decode('utf-8')
+
+                str_ = json.dumps(coco_seg_result, indent=None)
+                if len(str_) > 0:
+                    output.write(str_)
+
+                # Add comma separator
+                output.write(',')
+
+                # Add line break
+                output.write('\n')
+
+        # Annotation end
+        output.write(']')
 
 
 if __name__ == '__main__':
@@ -361,8 +392,9 @@ if __name__ == '__main__':
     parser.add_argument('--weights', required=False,
                         metavar="/path/to/weights.h5",
                         # default='imagenet',     # defautl imagenet weights
-                        # default=r'Y:\Users\Jie\CerCyt\nucleus_mrcnn\logs\nucleus20190709T1625\mask_rcnn_nucleus_0040.h5',
-                        default=r'Y:\Users\Jie\CerCyt\nucleus_mrcnn\logs\nucleus20190709T1625\mask_rcnn_nucleus_0060.h5',
+                        # default=r'Y:\Users\Jie\CerCyt\nucleus_mrcnn\logs\nucleus20190709T1625-all_kaggle-heads_only\mask_rcnn_nucleus_0020.h5',
+                        # default=r'Y:\Users\Jie\CerCyt\nucleus_mrcnn\logs\nucleus20190709T1625-all_kaggle-all_layers\mask_rcnn_nucleus_0040.h5',
+                        default=r'Y:\Users\Jie\CerCyt\nucleus_mrcnn\logs\nucleus20190709T1625-16_kaggle_158_step\mask_rcnn_nucleus_0061.h5',
                         # default=KAGGLE_16_WEIGHTS_PATH,
                         help="Path to model weights .h5 file or 'coco'")
     parser.add_argument('--logs', required=False,
@@ -376,7 +408,8 @@ if __name__ == '__main__':
                         help="Subset of dataset to run prediction on")
     parser.add_argument('--image_folder', required=False,
                         metavar="/path/to/image_folder",
-                        default=DEFAULT_IMAGE_DIR,
+                        # default=DEFAULT_IMAGE_DIR,
+                        default=r'Y:\Users\Jie\CerCyt\BD_cytology_25\nuclei_segmentation\normal-abnormal',
                         help="The folder path of the images to be segmented")
     args = parser.parse_args()
 
@@ -397,6 +430,12 @@ if __name__ == '__main__':
     # Configurations
     if args.command == "train":
         config = NucleusConfig()
+        # if args.subset == 'stage1_train_cervical_train':
+        #     config.IMAGES_PER_GPU = 1
+        #     config.BATCH_SIZE = 1
+        #     config.LEARNING_RATE = 0.000001
+        #     config.STEPS_PER_EPOCH = 11    # We have totally 16 cervical nuclei images in Kaggle dataset
+        #     config.VALIDATION_STEPS = 5    # Use 11 of them for training and 5 for validation
     else:
         config = NucleusInferenceConfig()
     config.display()

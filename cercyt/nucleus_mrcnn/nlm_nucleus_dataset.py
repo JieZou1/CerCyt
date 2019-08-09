@@ -14,7 +14,7 @@ class NlmNucleusDataset(utils.Dataset):
         image_list = next(os.walk(dataset_dir))[2]
         # Add images
         for image_id in image_list:
-            if image_id.endswith('.tif'):
+            if image_id.endswith('.tif') or image_id.endswith('.bmp'):
                 self.add_image(
                     "nucleus",
                     image_id=image_id,

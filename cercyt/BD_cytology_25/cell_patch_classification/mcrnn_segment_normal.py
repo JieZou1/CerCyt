@@ -69,7 +69,6 @@ for slide_id in slides:
         detection = model.detect([image])
         if len(detection) == 0:
             continue
-
         results = detection[0]
 
         # save segmentation for visualization

@@ -74,7 +74,10 @@ for tif_path in tif_paths:
     image = ndpi_slide.read_region(location, 0, (patch_size, patch_size))
     height, width, depth = image.shape
     image = cv2.resize(image, (int(width/2), int(height/2)))
-    results = model.detect([image])[0]
+    detection = model.detect([image])
+    if len(detection) == 0:
+        continue
+    results = detection[0]
 
     # save segmentation for visualization
     vis_path = tif_path.replace('.tif', '.jpg')
