@@ -6,6 +6,9 @@ Use Masked-RCNN to do nuclei instance segmentation. Then, based on the detected 
 a patch. This patch is called cell patch, in comparison to the previous methods based on scanning window
 patch. The classification is based on the cell patches.
 
+Y: drive is mapped to \\lhcdevfiler\cervixca\
+Z: drive is mapped to \\ceb-na\jie_project\
+
 Steps:
 
 ### crop_into_tile_patches

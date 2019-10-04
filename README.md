@@ -7,13 +7,16 @@ Use Masked-RCNN to do nuclei instance segmentation. Then, based on the detected 
 a patch. This patch is called cell patch, in comparison to the previous methods based on scanning window
 patch. The classification is based on the cell patches.
 
+Y: drive is mapped to \\lhcdevfiler\cervixca\
+Z: drive is mapped to \\ceb-na\jie_project\
+
 Steps:
 
 ### Create blue inks ROIs
 All G Tom annotation is under blue ink roi, so we should crop the ROI out. 
 Currently, the ROI coordinates in level 3 resolution is at Y:\Cytology\generated_out\rois_matched_level3.
-However, some ROI may miss G Tom annotation, so we may need to modify some ROIs.
-The finally ROIs are at Y:\Users\Jie\CerCyt\BD_cytology_25\blue_rois.
+However, some G Tom annotations may be outside of the ROI, so we need to modify some ROIs.
+The finally ROIs are at Y:\Users\Jie\CerCyt\cell_patch_classification\roi_level0.
 
 * We convert level 3 coordinates to level 0 coordinates and crop the corresponding ROI patches
 * If we notice misses of G Tom's annotation, we manually increase the ROI.
@@ -29,7 +32,7 @@ Detect any annotation outside of the current Ink ROI, and then manually increase
 Any nuclei inside G Tom annotation is counted as abnormal; otherwise, normal
 
 ### Train a CNN model to do normal/abnormal cell classification
-Partition the 25 slides into training and evluation set
+Partition the 25 slides into training and evaluation set
 
 
 

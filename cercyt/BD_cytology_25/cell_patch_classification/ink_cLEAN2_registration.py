@@ -4,7 +4,7 @@ import numpy as np
 
 from cercyt.BD_cytology_25.cell_patch_classification.shared import \
     DIR_cLEAN2, DIR_ink, DIR_image_align_ink2clean, \
-    AlignImages \
+    AlignImages
 from cercyt.shared.NDPI_Slide import NDPI_Slide
 
 clean_ndpi_paths = glob.glob(DIR_cLEAN2 + '/*.ndpi')
